@@ -27,7 +27,7 @@
 ----
 
 ### 📸 Preview
-![SpendWise Dashboard](./src/images/)
+![SpendWise Dashboard](./src/images/desktop-view.png)
 
 ----
 
