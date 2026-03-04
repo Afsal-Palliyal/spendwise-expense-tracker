@@ -7,7 +7,7 @@
 
 **SpendWise** is a sleek, mobile-first financial tool designed to track daily expenses, visualize spending patterns, and manage budgets through a modern dark-themed dashboard.
 
----
+----
 
 ### 🚀 Key Features
 * **Real-time Analytics:** Visualizes data using **Chart.js** doughnut charts.
@@ -16,7 +16,7 @@
 * **Secure Deletion:** Includes a custom **Confirmation Modal** to prevent accidental "Clear All Data" actions.
 * **Responsive UI:** Optimized for both Desktop and Mobile views with a focus on touch-friendly interactions.
 
----
+----
 
 ### 🛠️ Technical Implementation
 * **State Management:** Built with **React Functional Components** and Hooks.
@@ -24,12 +24,12 @@
 * **Layout Fixes:** Implemented custom CSS positioning to solve icon overlap issues in input fields.
 * **Animations:** Integrated CSS Keyframes for smooth transaction list transitions and dashboard updates.
 
----
+----
 
 ### 📸 Preview
 ![SpendWise Dashboard](./src/images/desktop-view.png)
 
----
+----
 
 ### 📥 Installation
 1. Clone the repo:
