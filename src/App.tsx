@@ -398,7 +398,7 @@ export default function App() {
               <TrendingDown className="w-5 h-5 text-emerald-500" />
               Expense Distribution
             </h3>
-            <div className="h-[320px] flex items-center justify-center relative">
+            <div className="h-80 flex items-center justify-center relative">
               {chartData.labels.length > 0 ? (
                 <Doughnut 
                   data={chartData} 
@@ -454,7 +454,7 @@ export default function App() {
 
         {/* Right Column: Transaction List */}
         <div className="lg:col-span-7 space-y-6">
-          <section className="glass-card flex flex-col h-full max-h-[900px]">
+          <section className="glass-card flex flex-col h-full max-h-225">
             <div className="p-7 border-b border-zinc-800 flex flex-col md:flex-row md:items-center justify-between gap-5">
               <h3 className="text-xl font-semibold flex items-center gap-2">
                 <FileText className="w-5 h-5 text-emerald-500" />
@@ -544,7 +544,7 @@ export default function App() {
                     </div>
                     <div>
                       <p className="text-zinc-400 font-bold text-lg">No transactions found</p>
-                      <p className="text-zinc-600 text-sm max-w-[200px] mx-auto mt-1">Start by adding your first income or expense above</p>
+                      <p className="text-zinc-600 text-sm max-w-50 mx-auto mt-1">Start by adding your first income or expense above</p>
                     </div>
                   </motion.div>
                 )}
