@@ -1,31 +1,31 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { 
-  Plus, 
-  Trash2, 
-  Wallet, 
-  TrendingUp, 
-  TrendingDown, 
-  Filter, 
-  Calendar, 
-  Tag, 
-  FileText,
-  RotateCcw,
-  IndianRupee,
-  AlertCircle
-} from 'lucide-react';
-import { 
-  Chart as ChartJS, 
-  ArcElement, 
-  Tooltip, 
-  Legend, 
-  CategoryScale, 
-  LinearScale 
+import {
+  ArcElement,
+  CategoryScale,
+  Chart as ChartJS,
+  Legend,
+  LinearScale,
+  Tooltip,
 } from 'chart.js';
-import { Doughnut } from 'react-chartjs-2';
-import { format } from 'date-fns';
 import { clsx, type ClassValue } from 'clsx';
+import { format } from 'date-fns';
+import {
+  AlertCircle,
+  Calendar,
+  FileText,
+  Filter,
+  IndianRupee,
+  Plus,
+  RotateCcw,
+  Tag,
+  Trash2,
+  TrendingDown,
+  TrendingUp,
+  Wallet,
+} from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Doughnut } from 'react-chartjs-2';
 import { twMerge } from 'tailwind-merge';
-import { motion, AnimatePresence } from 'motion/react';
 
 // --- Types ---
 
@@ -105,28 +105,31 @@ export default function App() {
   const [category, setCategory] = useState('Food');
   const [type, setType] = useState<TransactionType>('expense');
   const [filterCategory, setFilterCategory] = useState('All');
-  
+
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [isShaking, setIsShaking] = useState(false);
   const [showClearModal, setShowClearModal] = useState(false);
 
   // Persistence
   useEffect(() => {
-    localStorage.setItem('spendwise_transactions', JSON.stringify(transactions));
+    localStorage.setItem(
+      'spendwise_transactions',
+      JSON.stringify(transactions),
+    );
   }, [transactions]);
 
   // Calculations
   const filteredTransactions = useMemo(() => {
     if (filterCategory === 'All') return transactions;
-    return transactions.filter(t => t.category === filterCategory);
+    return transactions.filter((t) => t.category === filterCategory);
   }, [transactions, filterCategory]);
 
   const stats = useMemo(() => {
     const income = transactions
-      .filter(t => t.type === 'income')
+      .filter((t) => t.type === 'income')
       .reduce((acc, t) => acc + t.amount, 0);
     const expenses = transactions
-      .filter(t => t.type === 'expense')
+      .filter((t) => t.type === 'expense')
       .reduce((acc, t) => acc + t.amount, 0);
     return {
       income,
@@ -137,16 +140,18 @@ export default function App() {
 
   // Chart Data
   const chartData = useMemo(() => {
-    const expenseData = filteredTransactions.filter(t => t.type === 'expense');
+    const expenseData = filteredTransactions.filter(
+      (t) => t.type === 'expense',
+    );
     const categoryTotals: Record<string, number> = {};
 
-    expenseData.forEach(t => {
+    expenseData.forEach((t) => {
       categoryTotals[t.category] = (categoryTotals[t.category] || 0) + t.amount;
     });
 
     const labels = Object.keys(categoryTotals);
     const data = Object.values(categoryTotals);
-    const backgroundColors = labels.map(l => CATEGORY_COLORS[l] || '#cbd5e1');
+    const backgroundColors = labels.map((l) => CATEGORY_COLORS[l] || '#cbd5e1');
 
     return {
       labels,
@@ -172,7 +177,7 @@ export default function App() {
     if (!date) newErrors.date = 'Date is required';
 
     setErrors(newErrors);
-    
+
     if (Object.keys(newErrors).length > 0) {
       setIsShaking(true);
       setTimeout(() => setIsShaking(false), 400);
@@ -201,7 +206,7 @@ export default function App() {
   };
 
   const handleDeleteTransaction = (id: string) => {
-    setTransactions(transactions.filter(t => t.id !== id));
+    setTransactions(transactions.filter((t) => t.id !== id));
   };
 
   const handleClearAll = () => {
@@ -211,63 +216,92 @@ export default function App() {
   };
 
   // Clear error on change
-  const handleInputChange = (setter: (val: string) => void, field: keyof ValidationErrors) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setter(e.target.value);
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: undefined }));
-    }
-  };
+  const handleInputChange =
+    (setter: (val: string) => void, field: keyof ValidationErrors) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+      setter(e.target.value);
+      if (errors[field]) {
+        setErrors((prev) => ({ ...prev, [field]: undefined }));
+      }
+    };
 
   return (
-    <div className="min-h-screen p-4 md:p-8 max-w-7xl mx-auto space-y-8">
+    <div className="mx-auto min-h-screen max-w-7xl space-y-8 p-4 md:p-8">
       {/* Header */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <motion.div 
+      <header className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
+        <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <h1 className="text-4xl font-bold tracking-tight text-white flex items-center gap-3">
-            <div className="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/20">
-              <IndianRupee className="w-7 h-7 text-white" />
+          <h1 className="flex items-center gap-3 text-4xl font-bold tracking-tight text-white">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500 shadow-lg shadow-emerald-500/20">
+              <IndianRupee className="h-7 w-7 text-white" />
             </div>
             SpendWise
           </h1>
-          <p className="text-zinc-400 mt-1 ml-1">Professional Financial Management</p>
+          <p className="mt-1 ml-1 text-zinc-400">
+            Professional Financial Management
+          </p>
         </motion.div>
-        <button 
+        <button
           onClick={() => setShowClearModal(true)}
-          className="flex items-center gap-2 text-zinc-500 hover:text-rose-500 transition-colors text-sm font-medium px-4 py-2 rounded-xl hover:bg-rose-500/5"
+          className="flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium text-zinc-500 transition-colors hover:bg-rose-500/5 hover:text-rose-500"
         >
-          <RotateCcw className="w-4 h-4" />
+          <RotateCcw className="h-4 w-4" />
           Clear All Data
         </button>
       </header>
 
       {/* Dashboard Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         {[
-          { label: 'Total Balance', value: stats.balance, icon: Wallet, color: stats.balance >= 0 ? 'text-emerald-500' : 'text-rose-500', bg: 'bg-emerald-500/10' },
-          { label: 'Total Income', value: stats.income, icon: TrendingUp, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
-          { label: 'Total Expenses', value: stats.expenses, icon: TrendingDown, color: 'text-rose-500', bg: 'bg-rose-500/10' }
+          {
+            label: 'Total Balance',
+            value: stats.balance,
+            icon: Wallet,
+            color: stats.balance >= 0 ? 'text-emerald-500' : 'text-rose-500',
+            bg: 'bg-emerald-500/10',
+          },
+          {
+            label: 'Total Income',
+            value: stats.income,
+            icon: TrendingUp,
+            color: 'text-emerald-500',
+            bg: 'bg-emerald-500/10',
+          },
+          {
+            label: 'Total Expenses',
+            value: stats.expenses,
+            icon: TrendingDown,
+            color: 'text-rose-500',
+            bg: 'bg-rose-500/10',
+          },
         ].map((stat, idx) => (
-          <motion.div 
+          <motion.div
             key={stat.label}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.1 }}
-            className="glass-card p-6 flex items-center gap-5"
+            className="glass-card flex items-center gap-5 p-6"
           >
-            <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center shadow-inner", stat.bg)}>
-              <stat.icon className={cn("w-7 h-7", stat.color)} />
+            <div
+              className={cn(
+                'flex h-14 w-14 items-center justify-center rounded-2xl shadow-inner',
+                stat.bg,
+              )}
+            >
+              <stat.icon className={cn('h-7 w-7', stat.color)} />
             </div>
             <div>
-              <p className="text-sm font-medium text-zinc-500 mb-1">{stat.label}</p>
-              <motion.h2 
+              <p className="mb-1 text-sm font-medium text-zinc-500">
+                {stat.label}
+              </p>
+              <motion.h2
                 key={stat.value}
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className={cn("text-2xl font-bold tracking-tight", stat.color)}
+                className={cn('text-2xl font-bold tracking-tight', stat.color)}
               >
                 {formatCurrency(stat.value)}
               </motion.h2>
@@ -276,23 +310,30 @@ export default function App() {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
         {/* Left Column: Form & Chart */}
-        <div className="lg:col-span-5 space-y-8">
+        <div className="space-y-8 lg:col-span-5">
           {/* Add Transaction Form */}
-          <section className={cn("glass-card p-7 transition-all", isShaking && "animate-shake")}>
-            <h3 className="text-xl font-semibold mb-6 flex items-center gap-2">
-              <Plus className="w-5 h-5 text-emerald-500" />
+          <section
+            className={cn(
+              'glass-card p-7 transition-all',
+              isShaking && 'animate-shake',
+            )}
+          >
+            <h3 className="mb-6 flex items-center gap-2 text-xl font-semibold">
+              <Plus className="h-5 w-5 text-emerald-500" />
               Add Transaction
             </h3>
             <form onSubmit={handleAddTransaction} className="space-y-5">
-              <div className="flex p-1.5 bg-zinc-900 rounded-2xl border border-zinc-800">
+              <div className="flex rounded-2xl border border-zinc-800 bg-zinc-900 p-1.5">
                 <button
                   type="button"
                   onClick={() => setType('expense')}
                   className={cn(
-                    "flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300",
-                    type === 'expense' ? "bg-rose-500 text-white shadow-lg" : "text-zinc-500 hover:text-zinc-300"
+                    'flex-1 rounded-xl py-2.5 text-sm font-semibold transition-all duration-300',
+                    type === 'expense'
+                      ? 'bg-rose-500 text-white shadow-lg'
+                      : 'text-zinc-500 hover:text-zinc-300',
                   )}
                 >
                   Expense
@@ -301,8 +342,10 @@ export default function App() {
                   type="button"
                   onClick={() => setType('income')}
                   className={cn(
-                    "flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300",
-                    type === 'income' ? "bg-emerald-500 text-white shadow-lg" : "text-zinc-400 hover:text-zinc-200"
+                    'flex-1 rounded-xl py-2.5 text-sm font-semibold transition-all duration-300',
+                    type === 'income'
+                      ? 'bg-emerald-500 text-white shadow-lg'
+                      : 'text-zinc-400 hover:text-zinc-200',
                   )}
                 >
                   Income
@@ -310,83 +353,102 @@ export default function App() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest ml-1">Description</label>
+                <label className="ml-1 text-xs font-bold tracking-widest text-zinc-500 uppercase">
+                  Description
+                </label>
                 <div className="relative">
-                  <FileText className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500 pointer-events-none" />
+                  <FileText className="pointer-events-none absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2 text-zinc-500" />
                   <input
                     type="text"
                     placeholder="e.g. Grocery Shopping"
-                    className={cn("input-field", errors.description && "input-field-error")}
+                    className={cn(
+                      'input-field',
+                      errors.description && 'input-field-error',
+                    )}
                     value={description}
                     onChange={handleInputChange(setDescription, 'description')}
                   />
                 </div>
                 {errors.description && (
-                  <p className="text-rose-500 text-xs mt-1 flex items-center gap-1 ml-1">
-                    <AlertCircle className="w-3 h-3" /> {errors.description}
+                  <p className="mt-1 ml-1 flex items-center gap-1 text-xs text-rose-500">
+                    <AlertCircle className="h-3 w-3" /> {errors.description}
                   </p>
                 )}
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest ml-1">Amount</label>
+                  <label className="ml-1 text-xs font-bold tracking-widest text-zinc-500 uppercase">
+                    Amount
+                  </label>
                   <div className="relative">
-                    <IndianRupee className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500 pointer-events-none" />
+                    <IndianRupee className="pointer-events-none absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2 text-zinc-500" />
                     <input
                       type="number"
                       step="0.01"
                       placeholder="0.00"
-                      className={cn("input-field", errors.amount && "input-field-error")}
+                      className={cn(
+                        'input-field',
+                        errors.amount && 'input-field-error',
+                      )}
                       value={amount}
                       onChange={handleInputChange(setAmount, 'amount')}
                     />
                   </div>
                   {errors.amount && (
-                    <p className="text-rose-500 text-xs mt-1 flex items-center gap-1 ml-1">
-                      <AlertCircle className="w-3 h-3" /> {errors.amount}
+                    <p className="mt-1 ml-1 flex items-center gap-1 text-xs text-rose-500">
+                      <AlertCircle className="h-3 w-3" /> {errors.amount}
                     </p>
                   )}
                 </div>
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest ml-1">Date</label>
+                  <label className="ml-1 text-xs font-bold tracking-widest text-zinc-500 uppercase">
+                    Date
+                  </label>
                   <div className="relative">
-                    <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500 pointer-events-none" />
+                    <Calendar className="pointer-events-none absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2 text-zinc-500" />
                     <input
                       type="date"
-                      className={cn("input-field", errors.date && "input-field-error")}
+                      className={cn(
+                        'input-field',
+                        errors.date && 'input-field-error',
+                      )}
                       value={date}
                       onChange={handleInputChange(setDate, 'date')}
                     />
                   </div>
                   {errors.date && (
-                    <p className="text-rose-500 text-xs mt-1 flex items-center gap-1 ml-1">
-                      <AlertCircle className="w-3 h-3" /> {errors.date}
+                    <p className="mt-1 ml-1 flex items-center gap-1 text-xs text-rose-500">
+                      <AlertCircle className="h-3 w-3" /> {errors.date}
                     </p>
                   )}
                 </div>
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest ml-1">Category</label>
+                <label className="ml-1 text-xs font-bold tracking-widest text-zinc-500 uppercase">
+                  Category
+                </label>
                 <div className="relative">
-                  <Tag className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500 pointer-events-none" />
+                  <Tag className="pointer-events-none absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2 text-zinc-500" />
                   <select
-                    className="input-field appearance-none cursor-pointer"
+                    className="input-field cursor-pointer appearance-none"
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
                   >
-                    {CATEGORIES.map(cat => (
-                      <option key={cat} value={cat} className="bg-zinc-900">{cat}</option>
+                    {CATEGORIES.map((cat) => (
+                      <option key={cat} value={cat} className="bg-zinc-900">
+                        {cat}
+                      </option>
                     ))}
                   </select>
                 </div>
               </div>
 
-              <button type="submit" className="btn-primary w-full mt-4 group">
+              <button type="submit" className="btn-primary group mt-4 w-full">
                 <span className="flex items-center justify-center gap-2">
                   Add {type === 'income' ? 'Income' : 'Expense'}
-                  <Plus className="w-4 h-4 group-hover:rotate-90 transition-transform" />
+                  <Plus className="h-4 w-4 transition-transform group-hover:rotate-90" />
                 </span>
               </button>
             </form>
@@ -394,14 +456,14 @@ export default function App() {
 
           {/* Chart Visualization */}
           <section className="glass-card p-7">
-            <h3 className="text-xl font-semibold mb-6 flex items-center gap-2">
-              <TrendingDown className="w-5 h-5 text-emerald-500" />
+            <h3 className="mb-6 flex items-center gap-2 text-xl font-semibold">
+              <TrendingDown className="h-5 w-5 text-emerald-500" />
               Expense Distribution
             </h3>
-            <div className="h-80 flex items-center justify-center relative">
+            <div className="relative flex h-80 items-center justify-center">
               {chartData.labels.length > 0 ? (
-                <Doughnut 
-                  data={chartData} 
+                <Doughnut
+                  data={chartData}
                   options={{
                     responsive: true,
                     maintainAspectRatio: false,
@@ -409,7 +471,7 @@ export default function App() {
                       animateRotate: true,
                       animateScale: true,
                       duration: 1000,
-                      easing: 'easeOutQuart'
+                      easing: 'easeOutQuart',
                     },
                     plugins: {
                       legend: {
@@ -418,8 +480,8 @@ export default function App() {
                           color: '#71717a',
                           usePointStyle: true,
                           padding: 25,
-                          font: { size: 12, weight: 500 }
-                        }
+                          font: { size: 12, weight: 500 },
+                        },
                       },
                       tooltip: {
                         backgroundColor: '#18181b',
@@ -433,19 +495,21 @@ export default function App() {
                           label: (context) => {
                             const value = context.raw as number;
                             return ` ${formatCurrency(value)}`;
-                          }
-                        }
-                      }
+                          },
+                        },
+                      },
                     },
                     cutout: '75%',
-                  }} 
+                  }}
                 />
               ) : (
-                <div className="text-center space-y-3">
-                  <div className="w-20 h-20 bg-zinc-900 rounded-full flex items-center justify-center mx-auto border border-zinc-800">
-                    <TrendingDown className="w-10 h-10 text-zinc-700" />
+                <div className="space-y-3 text-center">
+                  <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full border border-zinc-800 bg-zinc-900">
+                    <TrendingDown className="h-10 w-10 text-zinc-700" />
                   </div>
-                  <p className="text-zinc-500 text-sm font-medium">No expense data to visualize</p>
+                  <p className="text-sm font-medium text-zinc-500">
+                    No expense data to visualize
+                  </p>
                 </div>
               )}
             </div>
@@ -453,98 +517,117 @@ export default function App() {
         </div>
 
         {/* Right Column: Transaction List */}
-        <div className="lg:col-span-7 space-y-6">
-          <section className="glass-card flex flex-col h-full max-h-225">
-            <div className="p-7 border-b border-zinc-800 flex flex-col md:flex-row md:items-center justify-between gap-5">
-              <h3 className="text-xl font-semibold flex items-center gap-2">
-                <FileText className="w-5 h-5 text-emerald-500" />
+        <div className="space-y-6 lg:col-span-7">
+          <section className="glass-card flex h-full max-h-225 flex-col">
+            <div className="flex flex-col justify-between gap-5 border-b border-zinc-800 p-7 md:flex-row md:items-center">
+              <h3 className="flex items-center gap-2 text-xl font-semibold">
+                <FileText className="h-5 w-5 text-emerald-500" />
                 Recent Transactions
               </h3>
-              
-              <div className="flex items-center gap-3 bg-zinc-900 p-1.5 rounded-2xl border border-zinc-800">
-                <Filter className="w-4 h-4 text-zinc-500 ml-3" />
+
+              <div className="flex items-center gap-3 rounded-2xl border border-zinc-800 bg-zinc-900 p-1.5">
+                <Filter className="ml-3 h-4 w-4 text-zinc-500" />
                 <select
-                  className="bg-transparent text-sm text-zinc-300 focus:outline-none pr-4 py-1.5 cursor-pointer"
+                  className="cursor-pointer bg-transparent py-1.5 pr-4 text-sm text-zinc-300 focus:outline-none"
                   value={filterCategory}
                   onChange={(e) => setFilterCategory(e.target.value)}
                 >
-                  <option value="All" className="bg-zinc-900">All Categories</option>
-                  {CATEGORIES.map(cat => (
-                    <option key={cat} value={cat} className="bg-zinc-900">{cat}</option>
+                  <option value="All" className="bg-zinc-900">
+                    All Categories
+                  </option>
+                  {CATEGORIES.map((cat) => (
+                    <option key={cat} value={cat} className="bg-zinc-900">
+                      {cat}
+                    </option>
                   ))}
                 </select>
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-3 custom-scrollbar">
+            <div className="custom-scrollbar flex-1 overflow-y-auto p-3">
               <AnimatePresence mode="popLayout">
                 {filteredTransactions.length > 0 ? (
                   <div className="space-y-3">
                     {filteredTransactions.map((t) => (
-                      <motion.div 
-                        key={t.id} 
+                      <motion.div
+                        key={t.id}
                         layout
                         initial={{ opacity: 0, y: 20, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, x: -50, scale: 0.95 }}
-                        transition={{ duration: 0.3, type: 'spring', stiffness: 300, damping: 25 }}
-                        className="group flex items-center justify-between p-5 rounded-2xl bg-zinc-900/50 hover:bg-zinc-800/60 transition-all border border-zinc-800/50 hover:border-zinc-700 shadow-sm"
+                        transition={{
+                          duration: 0.3,
+                          type: 'spring',
+                          stiffness: 300,
+                          damping: 25,
+                        }}
+                        className="group flex items-center justify-between rounded-2xl border border-zinc-800/50 bg-zinc-900/50 p-5 shadow-sm transition-all hover:border-zinc-700 hover:bg-zinc-800/60"
                       >
                         <div className="flex items-center gap-5">
-                          <div 
-                            className="w-12 h-12 rounded-2xl flex items-center justify-center text-white font-bold text-sm shadow-lg"
-                            style={{ 
-                              backgroundColor: `${CATEGORY_COLORS[t.category] || '#6b7280'}15`, 
+                          <div
+                            className="flex h-12 w-12 items-center justify-center rounded-2xl text-sm font-bold text-white shadow-lg"
+                            style={{
+                              backgroundColor: `${CATEGORY_COLORS[t.category] || '#6b7280'}15`,
                               color: CATEGORY_COLORS[t.category] || '#6b7280',
-                              border: `1px solid ${CATEGORY_COLORS[t.category] || '#6b7280'}30`
+                              border: `1px solid ${CATEGORY_COLORS[t.category] || '#6b7280'}30`,
                             }}
                           >
                             {t.category.charAt(0)}
                           </div>
                           <div>
-                            <h4 className="font-bold text-zinc-100 tracking-tight">{t.description}</h4>
-                            <div className="flex items-center gap-4 mt-1">
-                              <span className="text-xs font-semibold text-zinc-500 flex items-center gap-1.5">
-                                <Tag className="w-3.5 h-3.5" />
+                            <h4 className="font-bold tracking-tight text-zinc-100">
+                              {t.description}
+                            </h4>
+                            <div className="mt-1 flex items-center gap-4">
+                              <span className="flex items-center gap-1.5 text-xs font-semibold text-zinc-500">
+                                <Tag className="h-3.5 w-3.5" />
                                 {t.category}
                               </span>
-                              <span className="text-xs font-semibold text-zinc-500 flex items-center gap-1.5">
-                                <Calendar className="w-3.5 h-3.5" />
+                              <span className="flex items-center gap-1.5 text-xs font-semibold text-zinc-500">
+                                <Calendar className="h-3.5 w-3.5" />
                                 {format(new Date(t.date), 'MMM dd, yyyy')}
                               </span>
                             </div>
                           </div>
                         </div>
-                        
+
                         <div className="flex items-center gap-5">
-                          <span className={cn(
-                            "font-bold text-lg tracking-tight",
-                            t.type === 'income' ? "text-emerald-500" : "text-rose-500"
-                          )}>
+                          <span
+                            className={cn(
+                              'text-lg font-bold tracking-tight',
+                              t.type === 'income'
+                                ? 'text-emerald-500'
+                                : 'text-rose-500',
+                            )}
+                          >
                             {formatCurrency(t.amount, t.type)}
                           </span>
                           <button
                             onClick={() => handleDeleteTransaction(t.id)}
-                            className="p-2.5 text-zinc-600 hover:text-rose-500 hover:bg-rose-500/10 rounded-xl transition-all opacity-0 group-hover:opacity-100 active:scale-90"
+                            className="rounded-xl p-2.5 text-zinc-600 opacity-0 transition-all group-hover:opacity-100 hover:bg-rose-500/10 hover:text-rose-500 active:scale-90"
                           >
-                            <Trash2 className="w-5 h-5" />
+                            <Trash2 className="h-5 w-5" />
                           </button>
                         </div>
                       </motion.div>
                     ))}
                   </div>
                 ) : (
-                  <motion.div 
+                  <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className="h-full flex flex-col items-center justify-center text-center p-16 space-y-5"
+                    className="flex h-full flex-col items-center justify-center space-y-5 p-16 text-center"
                   >
-                    <div className="w-24 h-24 bg-zinc-900 rounded-3xl flex items-center justify-center border border-zinc-800 shadow-inner">
-                      <FileText className="w-12 h-12 text-zinc-800" />
+                    <div className="flex h-24 w-24 items-center justify-center rounded-3xl border border-zinc-800 bg-zinc-900 shadow-inner">
+                      <FileText className="h-12 w-12 text-zinc-800" />
                     </div>
                     <div>
-                      <p className="text-zinc-400 font-bold text-lg">No transactions found</p>
-                      <p className="text-zinc-600 text-sm max-w-50 mx-auto mt-1">Start by adding your first income or expense above</p>
+                      <p className="text-lg font-bold text-zinc-400">
+                        No transactions found
+                      </p>
+                      <p className="mx-auto mt-1 max-w-50 text-sm text-zinc-600">
+                        Start by adding your first income or expense above
+                      </p>
                     </div>
                   </motion.div>
                 )}
@@ -569,22 +652,27 @@ export default function App() {
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="relative glass-card p-8 max-w-md w-full shadow-2xl border-zinc-800/50"
+              className="glass-card relative w-full max-w-md border-zinc-800/50 p-8 shadow-2xl"
             >
-              <div className="flex items-center gap-4 mb-6">
-                <div className="w-14 h-14 rounded-2xl bg-rose-500/10 flex items-center justify-center">
-                  <AlertCircle className="w-8 h-8 text-rose-500" />
+              <div className="mb-6 flex items-center gap-4">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-500/10">
+                  <AlertCircle className="h-8 w-8 text-rose-500" />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-bold text-white">Clear All Records?</h3>
-                  <p className="text-zinc-400 mt-1">This action cannot be undone.</p>
+                  <h3 className="text-2xl font-bold text-white">
+                    Clear All Records?
+                  </h3>
+                  <p className="mt-1 text-zinc-400">
+                    This action cannot be undone.
+                  </p>
                 </div>
               </div>
-              
-              <p className="text-zinc-300 mb-8 leading-relaxed">
-                Are you sure you want to delete all transactions? This will permanently remove your financial history from this device.
+
+              <p className="mb-8 leading-relaxed text-zinc-300">
+                Are you sure you want to delete all transactions? This will
+                permanently remove your financial history from this device.
               </p>
-              
+
               <div className="grid grid-cols-2 gap-4">
                 <button
                   onClick={() => setShowClearModal(false)}
@@ -592,10 +680,7 @@ export default function App() {
                 >
                   Cancel
                 </button>
-                <button
-                  onClick={handleClearAll}
-                  className="btn-danger"
-                >
+                <button onClick={handleClearAll} className="btn-danger">
                   Clear Everything
                 </button>
               </div>
@@ -605,9 +690,10 @@ export default function App() {
       </AnimatePresence>
 
       {/* Footer */}
-      <footer className="pt-10 pb-4 border-t border-zinc-900 text-center">
-        <p className="text-zinc-600 text-xs font-medium tracking-widest uppercase">
-          SpendWise &bull; Secure Local Storage &bull; Built with Precision &bull; {new Date().getFullYear()}
+      <footer className="border-t border-zinc-900 pt-10 pb-4 text-center">
+        <p className="text-xs font-medium tracking-widest text-zinc-600 uppercase">
+          SpendWise &bull; Secure Local Storage &bull; Built with Precision
+          &bull; {new Date().getFullYear()}
         </p>
       </footer>
     </div>
