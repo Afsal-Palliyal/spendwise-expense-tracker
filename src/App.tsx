@@ -410,7 +410,7 @@ export default function App() {
                     <input
                       type="date"
                       className={cn(
-                        'input-field',
+                        'input-field block w-full min-w-0 appearance-none bg-transparent',
                         errors.date && 'input-field-error',
                       )}
                       value={date}
@@ -561,53 +561,54 @@ export default function App() {
                           stiffness: 300,
                           damping: 25,
                         }}
-                        className="group flex items-center justify-between rounded-2xl border border-zinc-800/50 bg-zinc-900/50 p-5 shadow-sm transition-all hover:border-zinc-700 hover:bg-zinc-800/60"
                       >
-                        <div className="flex items-center gap-5">
-                          <div
-                            className="flex h-12 w-12 items-center justify-center rounded-2xl text-sm font-bold text-white shadow-lg"
-                            style={{
-                              backgroundColor: `${CATEGORY_COLORS[t.category] || '#6b7280'}15`,
-                              color: CATEGORY_COLORS[t.category] || '#6b7280',
-                              border: `1px solid ${CATEGORY_COLORS[t.category] || '#6b7280'}30`,
-                            }}
-                          >
-                            {t.category.charAt(0)}
-                          </div>
-                          <div>
-                            <h4 className="font-bold tracking-tight text-zinc-100">
-                              {t.description}
-                            </h4>
-                            <div className="mt-1 flex items-center gap-4">
-                              <span className="flex items-center gap-1.5 text-xs font-semibold text-zinc-500">
-                                <Tag className="h-3.5 w-3.5" />
-                                {t.category}
-                              </span>
-                              <span className="flex items-center gap-1.5 text-xs font-semibold text-zinc-500">
-                                <Calendar className="h-3.5 w-3.5" />
-                                {format(new Date(t.date), 'MMM dd, yyyy')}
-                              </span>
+                        <div className="group flex items-center justify-between gap-3 rounded-2xl border border-zinc-800/50 bg-zinc-900/50 p-4 shadow-sm transition-all hover:border-zinc-700 hover:bg-zinc-800/60 sm:p-5">
+                          <div className="flex min-w-0 flex-1 items-center gap-3 sm:gap-5">
+                            <div
+                              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-sm font-bold text-white shadow-lg"
+                              style={{
+                                backgroundColor: `${CATEGORY_COLORS[t.category] || '#6b7280'}15`,
+                                color: CATEGORY_COLORS[t.category] || '#6b7280',
+                                border: `1px solid ${CATEGORY_COLORS[t.category] || '#6b7280'}30`,
+                              }}
+                            >
+                              {t.category.charAt(0)}
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <h4 className="truncate font-bold tracking-tight text-zinc-100">
+                                {t.description}
+                              </h4>
+                              <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
+                                <span className="flex items-center gap-1.5 whitespace-nowrap text-xs font-semibold text-zinc-500">
+                                  <Tag className="h-3.5 w-3.5" />
+                                  {t.category}
+                                </span>
+                                <span className="flex items-center gap-1.5 whitespace-nowrap text-xs font-semibold text-zinc-500">
+                                  <Calendar className="h-3.5 w-3.5" />
+                                  {format(new Date(t.date), 'MMM dd, yyyy')}
+                                </span>
+                              </div>
                             </div>
                           </div>
-                        </div>
 
-                        <div className="flex items-center gap-5">
-                          <span
-                            className={cn(
-                              'text-lg font-bold tracking-tight',
-                              t.type === 'income'
-                                ? 'text-emerald-500'
-                                : 'text-rose-500',
-                            )}
-                          >
-                            {formatCurrency(t.amount, t.type)}
-                          </span>
-                          <button
-                            onClick={() => handleDeleteTransaction(t.id)}
-                            className="rounded-xl p-2.5 text-zinc-600 opacity-0 transition-all group-hover:opacity-100 hover:bg-rose-500/10 hover:text-rose-500 active:scale-90"
-                          >
-                            <Trash2 className="h-5 w-5" />
-                          </button>
+                          <div className="flex shrink-0 items-center gap-2 sm:gap-5">
+                            <span
+                              className={cn(
+                                'whitespace-nowrap text-base font-bold tracking-tight sm:text-lg',
+                                t.type === 'income'
+                                  ? 'text-emerald-500'
+                                  : 'text-rose-500',
+                              )}
+                            >
+                              {formatCurrency(t.amount, t.type)}
+                            </span>
+                            <button
+                              onClick={() => handleDeleteTransaction(t.id)}
+                              className="rounded-xl p-2 text-zinc-600 opacity-100 transition-all hover:bg-rose-500/10 hover:text-rose-500 focus:opacity-100 active:scale-90 sm:p-2.5 sm:opacity-0 sm:group-hover:opacity-100"
+                            >
+                              <Trash2 className="h-5 w-5" />
+                            </button>
+                          </div>
                         </div>
                       </motion.div>
                     ))}
