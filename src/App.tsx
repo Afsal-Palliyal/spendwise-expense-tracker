@@ -11,6 +11,7 @@ import { format } from 'date-fns';
 import {
   AlertCircle,
   Calendar,
+  Download,
   FileText,
   Filter,
   IndianRupee,
@@ -26,12 +27,13 @@ import { AnimatePresence, motion } from 'motion/react';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Doughnut } from 'react-chartjs-2';
 import { twMerge } from 'tailwind-merge';
+import { exportTransactionsToCSV } from './utils/exportCSV';
 
 // --- Types ---
 
 type TransactionType = 'income' | 'expense';
 
-interface Transaction {
+export interface Transaction {
   id: string;
   description: string;
   amount: number;
@@ -244,13 +246,22 @@ export default function App() {
             Professional Financial Management
           </p>
         </motion.div>
-        <button
-          onClick={() => setShowClearModal(true)}
-          className="flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium text-zinc-500 transition-colors hover:bg-rose-500/5 hover:text-rose-500"
-        >
-          <RotateCcw className="h-4 w-4" />
-          Clear All Data
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => exportTransactionsToCSV(transactions)}
+            className="flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium text-zinc-500 transition-colors hover:bg-emerald-500/5 hover:text-emerald-500"
+          >
+            <Download className="h-4 w-4" />
+            Export CSV
+          </button>
+          <button
+            onClick={() => setShowClearModal(true)}
+            className="flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium text-zinc-500 transition-colors hover:bg-rose-500/5 hover:text-rose-500"
+          >
+            <RotateCcw className="h-4 w-4" />
+            Clear All Data
+          </button>
+        </div>
       </header>
 
       {/* Dashboard Stats */}
