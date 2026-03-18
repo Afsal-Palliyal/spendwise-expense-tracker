@@ -22,6 +22,7 @@ import {
   TrendingDown,
   TrendingUp,
   Wallet,
+  Pencil,
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -111,6 +112,15 @@ export default function App() {
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [isShaking, setIsShaking] = useState(false);
   const [showClearModal, setShowClearModal] = useState(false);
+
+  // Edit Form State
+  const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
+  const [editDescription, setEditDescription] = useState('');
+  const [editAmount, setEditAmount] = useState('');
+  const [editDate, setEditDate] = useState('');
+  const [editCategory, setEditCategory] = useState('Food');
+  const [editType, setEditType] = useState<TransactionType>('expense');
+  const [editErrors, setEditErrors] = useState<ValidationErrors>({});
 
   // Persistence
   useEffect(() => {
@@ -209,6 +219,53 @@ export default function App() {
 
   const handleDeleteTransaction = (id: string) => {
     setTransactions(transactions.filter((t) => t.id !== id));
+  };
+
+  const openEditModal = (t: Transaction) => {
+    setEditingTransaction(t);
+    setEditDescription(t.description);
+    setEditAmount(t.amount.toString());
+    setEditDate(t.date);
+    setEditCategory(t.category);
+    setEditType(t.type);
+    setEditErrors({});
+  };
+
+  const closeEditModal = () => {
+    setEditingTransaction(null);
+  };
+
+  const validateEdit = (): boolean => {
+    const newErrors: ValidationErrors = {};
+    if (!editDescription.trim()) newErrors.description = 'Description is required';
+    if (!editAmount || isNaN(parseFloat(editAmount)) || parseFloat(editAmount) <= 0) {
+      newErrors.amount = 'Please enter a valid amount';
+    }
+    if (!editDate) newErrors.date = 'Date is required';
+
+    setEditErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleUpdateTransaction = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validateEdit() || !editingTransaction) return;
+
+    const updatedTransactions = transactions.map(t => 
+      t.id === editingTransaction.id 
+        ? {
+            ...t,
+            description: editDescription.trim(),
+            amount: parseFloat(editAmount),
+            date: editDate,
+            category: editCategory,
+            type: editType
+          }
+        : t
+    );
+    
+    setTransactions(updatedTransactions);
+    closeEditModal();
   };
 
   const handleClearAll = () => {
@@ -613,12 +670,20 @@ export default function App() {
                             >
                               {formatCurrency(t.amount, t.type)}
                             </span>
-                            <button
-                              onClick={() => handleDeleteTransaction(t.id)}
-                              className="rounded-xl p-2 text-zinc-600 opacity-100 transition-all hover:bg-rose-500/10 hover:text-rose-500 focus:opacity-100 active:scale-90 sm:p-2.5 sm:opacity-0 sm:group-hover:opacity-100"
-                            >
-                              <Trash2 className="h-5 w-5" />
-                            </button>
+                            <div className="flex items-center gap-1 sm:gap-2">
+                              <button
+                                onClick={() => openEditModal(t)}
+                                className="rounded-xl p-2 text-zinc-600 opacity-100 transition-all hover:bg-indigo-500/10 hover:text-indigo-400 focus:opacity-100 active:scale-90 sm:p-2.5 sm:opacity-0 sm:group-hover:opacity-100"
+                              >
+                                <Pencil className="h-4 w-4 sm:h-5 sm:w-5" />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteTransaction(t.id)}
+                                className="rounded-xl p-2 text-zinc-600 opacity-100 transition-all hover:bg-rose-500/10 hover:text-rose-500 focus:opacity-100 active:scale-90 sm:p-2.5 sm:opacity-0 sm:group-hover:opacity-100"
+                              >
+                                <Trash2 className="h-4 w-4 sm:h-5 sm:w-5" />
+                              </button>
+                            </div>
                           </div>
                         </div>
                       </motion.div>
@@ -696,6 +761,171 @@ export default function App() {
                   Clear Everything
                 </button>
               </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Edit Transaction Modal */}
+      <AnimatePresence>
+        {editingTransaction && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={closeEditModal}
+              className="absolute inset-0 bg-zinc-950/80 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="glass-card relative w-full max-w-md border-zinc-800/50 p-6 shadow-2xl overflow-y-auto max-h-[90vh] custom-scrollbar"
+            >
+              <div className="mb-6 flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-500/10">
+                  <Pencil className="h-5 w-5 text-indigo-400" />
+                </div>
+                <h3 className="text-xl font-bold text-white">
+                  Edit Transaction
+                </h3>
+              </div>
+
+              <form onSubmit={handleUpdateTransaction} className="space-y-4">
+                <div className="flex rounded-xl border border-zinc-800 bg-zinc-900/50 p-1">
+                  <button
+                    type="button"
+                    onClick={() => setEditType('expense')}
+                    className={cn(
+                      'flex-1 rounded-lg py-2 text-sm font-semibold transition-all duration-300',
+                      editType === 'expense'
+                        ? 'bg-rose-500 text-white shadow-lg'
+                        : 'text-zinc-500 hover:text-zinc-300',
+                    )}
+                  >
+                    Expense
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEditType('income')}
+                    className={cn(
+                      'flex-1 rounded-lg py-2 text-sm font-semibold transition-all duration-300',
+                      editType === 'income'
+                        ? 'bg-emerald-500 text-white shadow-lg'
+                        : 'text-zinc-400 hover:text-zinc-200',
+                    )}
+                  >
+                    Income
+                  </button>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="ml-1 text-[10px] font-bold tracking-widest text-zinc-500 uppercase">
+                    Description
+                  </label>
+                  <div className="relative">
+                    <FileText className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-zinc-500" />
+                    <input
+                      type="text"
+                      className={cn(
+                        'input-field py-2 pl-9 text-sm',
+                        editErrors.description && 'input-field-error',
+                      )}
+                      value={editDescription}
+                      onChange={(e) => {
+                        setEditDescription(e.target.value);
+                        if (editErrors.description) setEditErrors(prev => ({ ...prev, description: undefined }));
+                      }}
+                    />
+                  </div>
+                  {editErrors.description && (
+                    <p className="mt-1 ml-1 flex items-center gap-1 text-[11px] text-rose-500">
+                      <AlertCircle className="h-3 w-3" /> {editErrors.description}
+                    </p>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="ml-1 text-[10px] font-bold tracking-widest text-zinc-500 uppercase">
+                      Amount
+                    </label>
+                    <div className="relative">
+                      <IndianRupee className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-zinc-500" />
+                      <input
+                        type="number"
+                        step="0.01"
+                        className={cn(
+                          'input-field py-2 pl-9 text-sm',
+                          editErrors.amount && 'input-field-error',
+                        )}
+                        value={editAmount}
+                        onChange={(e) => {
+                          setEditAmount(e.target.value);
+                          if (editErrors.amount) setEditErrors(prev => ({ ...prev, amount: undefined }));
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="ml-1 text-[10px] font-bold tracking-widest text-zinc-500 uppercase">
+                      Date
+                    </label>
+                    <div className="relative">
+                      <Calendar className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-zinc-500" />
+                      <input
+                        type="date"
+                        className={cn(
+                          'input-field block w-full min-w-0 appearance-none bg-transparent py-2 pl-9 text-sm',
+                          editErrors.date && 'input-field-error',
+                        )}
+                        value={editDate}
+                        onChange={(e) => {
+                          setEditDate(e.target.value);
+                          if (editErrors.date) setEditErrors(prev => ({ ...prev, date: undefined }));
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="ml-1 text-[10px] font-bold tracking-widest text-zinc-500 uppercase">
+                    Category
+                  </label>
+                  <div className="relative">
+                    <Tag className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-zinc-500" />
+                    <select
+                      className="input-field cursor-pointer appearance-none py-2 pl-9 text-sm"
+                      value={editCategory}
+                      onChange={(e) => setEditCategory(e.target.value)}
+                    >
+                      {CATEGORIES.map((cat) => (
+                        <option key={cat} value={cat} className="bg-zinc-900">
+                          {cat}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="mt-6 flex gap-3">
+                  <button
+                    type="button"
+                    onClick={closeEditModal}
+                    className="flex-1 rounded-xl bg-zinc-800/50 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-700 focus:outline-none focus:ring-2 focus:ring-zinc-500 focus:ring-offset-2 focus:ring-offset-zinc-950"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="flex-1 rounded-xl bg-emerald-500 py-2.5 text-sm font-medium text-white transition-all hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-zinc-950"
+                  >
+                    Save Changes
+                  </button>
+                </div>
+              </form>
             </motion.div>
           </div>
         )}
