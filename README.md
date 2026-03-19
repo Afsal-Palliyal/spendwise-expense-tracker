@@ -9,20 +9,42 @@
 
 ----
 
+### 💡 Why SpendWise?
+
+Managing daily expenses can be messy and unintuitive. SpendWise simplifies personal finance by combining a clean UI with real-time insights, helping users track, analyze, and control their spending efficiently.
+
+----
+
 ### 🚀 Key Features
-* **Real-time Analytics:** Visualizes data using **Chart.js** doughnut charts.
-* **Local Persistence:** Uses **LocalStorage** to ensure your financial records stay saved even after refreshing the page.
-* **INR Localization:** Fully formatted for Indian currency (**₹**) including proper comma numbering.
-* **Secure Deletion:** Includes a custom **Confirmation Modal** to prevent accidental "Clear All Data" actions.
-* **Responsive UI:** Optimized for both Desktop and Mobile views with a focus on touch-friendly interactions.
+
+* **Transaction Management:** Add, edit, delete, and filter transactions with a smooth user experience.
+* **Real-time Analytics:** Visualize spending patterns with dynamic **Chart.js** charts.
+* **Category Insights:** Track expenses by category to understand spending habits.
+* **Local Persistence:** Uses **LocalStorage** to retain data across sessions.
+* **Secure Actions:** Confirmation modal prevents accidental data loss.
+* **INR Localization:** Fully formatted Indian currency (₹) with proper numbering.
+* **Responsive UI:** Optimized for mobile and desktop with modern dark UI.
+
+----
+
+### 🎨 UI/UX Highlights
+
+* Smooth modal-based editing experience
+* Clean and minimal dark-themed dashboard
+* Real-time UI updates without page reloads
+* Intuitive form handling with validation
 
 ----
 
 ### 🛠️ Technical Implementation
-* **State Management:** Built with **React Functional Components** and Hooks.
-* **Type Safety:** Developed using **TypeScript** for robust, error-free code.
-* **Layout Fixes:** Implemented custom CSS positioning to solve icon overlap issues in input fields.
-* **Animations:** Integrated CSS Keyframes for smooth transaction list transitions and dashboard updates.
+
+* **Frontend:** React (Hooks + Functional Components)
+* **Type Safety:** TypeScript for maintainable code
+* **State Management:** Local state with optimized updates
+* **Data Handling:** LocalStorage for persistence
+* **Charts:** Chart.js for data visualization
+* **Build Tool:** Vite for fast development and builds
+* **Styling:** SCSS with responsive design principles
 
 ----
 
@@ -32,6 +54,9 @@
 ----
 
 ### 📥 Installation
-1. Clone the repo:
-   ```bash
-   git clone [https://github.com/Afsal-Palliyal/spendwise-expense-tracker.git](https://github.com/Afsal-Palliyal/spendwise-expense-tracker.git)
+
+```bash
+git clone https://github.com/Afsal-Palliyal/spendwise-expense-tracker.git
+cd spendwise-expense-tracker
+npm install
+npm run dev
